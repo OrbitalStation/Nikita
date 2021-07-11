@@ -18,6 +18,7 @@ HEAD_SZ = 3
 DELAY = 0.02
 
 TELEGRAM_CHAT_ID = 1756668350
+PHONE_NUMBER = ''
 
 
 # Globals
@@ -64,7 +65,7 @@ def send_to_master():
 
         if spam:
             # TODO: Add to blacklist
-            bot.send_message(TELEGRAM_CHAT_ID, 'As a result, CALLER is a spammer, so number "TODO: PHONE" is now in blacklist.\nYou can undo it at any moment at your phone app.')
+            bot.send_message(TELEGRAM_CHAT_ID, f'As a result, CALLER is a spammer, so number "{PHONE_NUMBER}" is now in blacklist.\nYou can undo it at any moment at your phone app.')
     except Exception: pass
 
 
@@ -122,7 +123,16 @@ while True:
                 if not head: break
                 length = (int(head[1]) * 0x100) + (int(head[2]))
                 buf = conn.recv(length)
-                if head[0] != 0x10: continue
+                if head[0] != 0x10:
+                    if head[0] == 0x01:
+                        c = 0
+                        for i in buf[::-1][:10]:
+                            PHONE_NUMBER += str(i)
+                            c += 1
+                            if c == 10: break
+                        PHONE_NUMBER = PHONE_NUMBER[::-1]
+                        print(f'L={length} PHONE={PHONE_NUMBER}')
+                    continue
                 buf = audioop.ulaw2lin(buf, 2)
                 b += buf
                 dialog += buf
