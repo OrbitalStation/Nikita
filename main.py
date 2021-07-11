@@ -123,16 +123,7 @@ while True:
                 if not head: break
                 length = (int(head[1]) * 0x100) + (int(head[2]))
                 buf = conn.recv(length)
-                if head[0] != 0x10:
-                    if head[0] == 0x01:
-                        c = 0
-                        for i in buf[::-1][:10]:
-                            PHONE_NUMBER += str(i)
-                            c += 1
-                            if c == 10: break
-                        PHONE_NUMBER = PHONE_NUMBER[::-1]
-                        print(f'L={length} PHONE={PHONE_NUMBER}')
-                    continue
+                if head[0] != 0x10: continue
                 buf = audioop.ulaw2lin(buf, 2)
                 b += buf
                 dialog += buf
